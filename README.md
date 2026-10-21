@@ -1,16 +1,73 @@
-# React + Vite
+# QA Auto Engineer JavaScript Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Hexlet Check](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/hexlet-check.yml)
+[![Playwright Tests](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/playwright.yml/badge.svg)](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/playwright.yml)
 
-Currently, two official plugins are available:
+## Описание проекта
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Учебный проект по автоматизации тестирования веб-приложения Task Manager.
 
-## React Compiler
+Автоматизированные тесты написаны на JavaScript с использованием Playwright.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Проект включает end-to-end тесты для проверки основных функций приложения:
 
-## Expanding the ESLint configuration
+- Авторизация и выход из системы
+- Управление пользователями
+- Создание и управление метками
+- Создание и управление задачами
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Для организации тестов используется паттерн Page Object Model (POM).
+
+## Требования
+
+Для работы с проектом необходимы:
+
+- Node.js
+- npm
+- Make
+
+## Установка
+
+Клонировать репозиторий:
+
+```bash
+git clone https://github.com/gybins/qa-auto-engineer-javascript-project-90.git
+```
+
+Перейти в директорию проекта:
+
+```bash
+cd qa-auto-engineer-javascript-project-90
+```
+
+Установить зависимости:
+
+```bash
+make install
+```
+
+## Запуск приложения
+
+Для локального запуска приложения:
+
+```bash
+make dev
+```
+
+## Запуск тестов
+
+Для запуска автоматизированных тестов Playwright:
+
+```bash
+make test
+```
+
+Приложение запускается автоматически перед выполнением тестов.
+
+## Проверка линтером
+
+Для проверки качества кода:
+
+```bash
+make lint
+```
