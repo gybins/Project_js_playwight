@@ -1,15 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/auth.js";
 import UserPage from "../pages/UserPage.js";
-import LoginPage from "../pages/LoginPage.js";
-
-test.beforeEach(async ({ page }) => {
-  const loginPage = new LoginPage(page);
-
-  await loginPage.goto();
-  await loginPage.login("user", "password");
-
-  await expect(loginPage.avatar).toBeVisible();
-});
 
 test("check link create", async ({ page }) => {
   const userAdd = new UserPage(page);
@@ -41,6 +31,11 @@ test("create user", async ({ page }) => {
   await expect(saveUser.email).toHaveValue(email);
   await expect(saveUser.firstName).toHaveValue(firstName);
   await expect(saveUser.lastName).toHaveValue(lastName);
+  await saveUser.goto();
+  const row = saveUser.getUserRow(email);
+  await expect(row).toBeVisible();
+  await expect(row).toContainText(firstName);
+  await expect(row).toContainText(lastName);
 });
 
 test("user list", async ({ page }) => {
@@ -52,9 +47,7 @@ test("user list", async ({ page }) => {
   await expect(userPage.userFirstName).toBeVisible();
   await expect(userPage.userLastName).toBeVisible();
 
-  const userRow = page.getByRole("row").filter({
-    hasText: "john@google.com",
-  });
+  const userRow = userPage.getUserRow("john@google.com");
 
   await expect(userRow).toBeVisible();
   await expect(userRow).toContainText("John");
@@ -74,6 +67,8 @@ test("edit user form", async ({ page }) => {
   await expect(editUser.firstName).toBeVisible();
   await expect(editUser.lastName).toBeVisible();
 
+  await expect(editUser.email).toHaveValue(userEmail);
+  await expect(editUser.firstName).toHaveValue("John");
   const oldFirstName = await editUser.firstName.inputValue();
 
   const newFirstName = "Sergei";
@@ -90,7 +85,7 @@ test("edit user form", async ({ page }) => {
   await expect(userRow).not.toContainText(oldFirstName);
 });
 
-test("edit user valid email", async ({ page }) => {
+test("reject invalid user email", async ({ page }) => {
   const validEmail = new UserPage(page);
   await validEmail.goto();
 
@@ -98,6 +93,7 @@ test("edit user valid email", async ({ page }) => {
 
   await validEmail.openUser(userEmail);
 
+  await expect(validEmail.email).toHaveValue(userEmail);
   await validEmail.email.fill('"john@google');
   await validEmail.saveButton.click();
 
@@ -134,4 +130,25 @@ test("delete all users", async ({ page }) => {
 
   await expect(deleteAllUsers.bulkDeleteMessage).toBeVisible();
   await expect(deleteAllUsers.emptyUsersMessage).toBeVisible();
+});
+
+test("empty users cannot be created", async ({ page }) => {
+  const form = new UserPage(page);
+  await form.goto();
+  await form.openCreateForm();
+  await expect(form.saveButton).toBeDisabled();
+  await expect(page).toHaveURL(/\/create$/);
+  await expect(form.email).toHaveValue("");
+  await expect(form.firstName).toHaveValue("");
+  await expect(form.lastName).toHaveValue("");
+});
+
+test("user requires a first name", async ({ page }) => {
+  const userPage = new UserPage(page);
+  await userPage.goto();
+  await userPage.openCreateForm();
+  await userPage.createUser("new@example.com", "", "Doe");
+  await expect(userPage.firstName).toHaveAttribute("aria-invalid", "true");
+  await expect(page).toHaveURL(/\/create$/);
+  await expect(userPage.successMessage).toHaveCount(0);
 });

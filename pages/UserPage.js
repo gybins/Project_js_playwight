@@ -1,15 +1,14 @@
-export default class userPage {
+export default class UserPage {
   constructor(page) {
     this.page = page;
     this.createButton = page.getByRole("link", {
       name: "Create",
     });
-    this.email = page.locator('input[name="email"]');
-    this.firstName = page.locator('input[name="firstName"]');
-    this.lastName = page.locator('input[name="lastName"]');
+    this.email = page.getByRole("textbox", { name: "Email", exact: true });
+    this.firstName = page.getByRole("textbox", { name: "First name", exact: true });
+    this.lastName = page.getByRole("textbox", { name: "Last name", exact: true });
     this.saveButton = page.getByRole("button", { name: "Save" });
     this.successMessage = page.getByText("Element created");
-    this.redEyeIcon = page.getByTestId("RemoveRedEyeIcon");
     this.userEmail = page.getByRole("columnheader", { name: /Email/i });
     this.userFirstName = page.getByRole("columnheader", {
       name: /First name/i,
@@ -33,6 +32,7 @@ export default class userPage {
 
   async openCreateForm() {
     await this.createButton.click();
+    await this.email.click();
   }
 
   async createUser(email, firstName, lastName) {
@@ -53,6 +53,6 @@ export default class userPage {
   }
 
   getUserCheckBox(email) {
-    return this.getUserRow(email).locator("input[type='checkbox']");
+    return this.getUserRow(email).getByRole("checkbox");
   }
 }

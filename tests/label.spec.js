@@ -1,15 +1,6 @@
-import { test, expect } from "@playwright/test";
+import { uniqueName } from "./helpers/data.js";
+import { test, expect } from "./fixtures/auth.js";
 import LabelPage from "../pages/LabelPage.js";
-import LoginPage from "../pages/LoginPage.js";
-
-test.beforeEach(async ({ page }) => {
-  const loginPage = new LoginPage(page);
-
-  await loginPage.goto();
-  await loginPage.login("user", "password");
-
-  await expect(loginPage.avatar).toBeVisible();
-});
 
 test("check label create form", async ({ page }) => {
   const labelPage = new LabelPage(page);
@@ -22,10 +13,10 @@ test("check label create form", async ({ page }) => {
   await expect(labelPage.saveButton).toBeVisible();
 });
 
-test("create label", async ({ page }, testInfo) => {
+test("create label", async ({ page }) => {
   const labelPage = new LabelPage(page);
 
-  const name = `automation-${testInfo.project.name}-${Date.now()}`;
+  const name = uniqueName("automation");
 
   await labelPage.goto();
   await labelPage.openCreateForm();
@@ -35,10 +26,10 @@ test("create label", async ({ page }, testInfo) => {
   await expect(labelPage.name).toHaveValue(name);
 });
 
-test("label list", async ({ page }, testInfo) => {
+test("label list", async ({ page }) => {
   const labelPage = new LabelPage(page);
 
-  const name = `list-${testInfo.project.name}-${Date.now()}`;
+  const name = uniqueName("list");
 
   await labelPage.goto();
   await labelPage.openCreateForm();
@@ -54,10 +45,10 @@ test("label list", async ({ page }, testInfo) => {
   await expect(labelRow).toContainText(name);
 });
 
-test("open edit label form", async ({ page }, testInfo) => {
+test("open edit label form", async ({ page }) => {
   const labelPage = new LabelPage(page);
 
-  const name = `edit-form-${testInfo.project.name}-${Date.now()}`;
+  const name = uniqueName("edit-form");
 
   await labelPage.goto();
   await labelPage.openCreateForm();
@@ -70,11 +61,11 @@ test("open edit label form", async ({ page }, testInfo) => {
   await expect(labelPage.name).toHaveValue(name);
 });
 
-test("edit label", async ({ page }, testInfo) => {
+test("edit label", async ({ page }) => {
   const labelPage = new LabelPage(page);
 
-  const oldName = `before-edit-${testInfo.project.name}-${Date.now()}`;
-  const newName = `after-edit-${testInfo.project.name}-${Date.now()}`;
+  const oldName = uniqueName("before-edit");
+  const newName = uniqueName("after-edit");
 
   await labelPage.goto();
   await labelPage.openCreateForm();
@@ -83,6 +74,7 @@ test("edit label", async ({ page }, testInfo) => {
   await labelPage.goto();
   await labelPage.openLabel(oldName);
 
+  await expect(labelPage.name).toHaveValue(oldName);
   await labelPage.name.fill(newName);
   await labelPage.saveButton.click();
 
@@ -96,10 +88,10 @@ test("edit label", async ({ page }, testInfo) => {
   await expect(labelPage.getLabelRow(oldName)).toHaveCount(0);
 });
 
-test("delete label", async ({ page }, testInfo) => {
+test("delete label", async ({ page }) => {
   const labelPage = new LabelPage(page);
 
-  const name = `delete-${testInfo.project.name}-${Date.now()}`;
+  const name = uniqueName("delete");
 
   await labelPage.goto();
   await labelPage.openCreateForm();
@@ -114,12 +106,11 @@ test("delete label", async ({ page }, testInfo) => {
   await expect(labelPage.getLabelRow(name)).toHaveCount(0);
 });
 
-test("delete several labels", async ({ page }, testInfo) => {
+test("delete several labels", async ({ page }) => {
   const labelPage = new LabelPage(page);
 
-  const timestamp = Date.now();
-  const firstLabel = `bulk-1-${testInfo.project.name}-${timestamp}`;
-  const secondLabel = `bulk-2-${testInfo.project.name}-${timestamp}`;
+  const firstLabel = uniqueName("bulk-1");
+  const secondLabel = uniqueName("bulk-2");
 
   await labelPage.goto();
   await labelPage.openCreateForm();
@@ -140,4 +131,30 @@ test("delete several labels", async ({ page }, testInfo) => {
 
   await expect(labelPage.getLabelRow(firstLabel)).toHaveCount(0);
   await expect(labelPage.getLabelRow(secondLabel)).toHaveCount(0);
+});
+test("empty label cannot be created", async ({ page }) => {
+  const form = new LabelPage(page);
+  await form.goto();
+  await form.openCreateForm();
+  await expect(form.saveButton).toBeDisabled();
+  await expect(page).toHaveURL(/\/create$/);
+  await expect(form.name).toHaveValue("");
+});
+
+test("undo label deletion", async ({ page }) => {
+  const labelPage = new LabelPage(page);
+  const name = uniqueName("undo-delete");
+  await labelPage.goto();
+  await labelPage.openCreateForm();
+  await labelPage.createLabel(name);
+  await expect(labelPage.successMessage).toBeVisible();
+  await labelPage.goto();
+  await expect(labelPage.getLabelRow(name)).toBeVisible();
+  await labelPage.getLabelCheckbox(name).check();
+  await labelPage.deleteButton.click();
+  await expect(labelPage.getLabelRow(name)).toHaveCount(0);
+  await labelPage.undoButton.click();
+  await expect(labelPage.getLabelRow(name)).toBeVisible();
+  await labelPage.openLabel(name);
+  await expect(labelPage.name).toHaveValue(name);
 });

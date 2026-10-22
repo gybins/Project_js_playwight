@@ -2,9 +2,9 @@ export default class LabelPage {
   constructor(page) {
     this.page = page;
 
-    this.createButton = page.locator('a[href="#/labels/create"]');
+    this.createButton = page.getByRole("link", { name: "Create", exact: true });
 
-    this.name = page.locator('input[name="name"]');
+    this.name = page.getByRole("textbox", { name: "Name", exact: true });
 
     this.saveButton = page.getByRole("button", {
       name: "Save",
@@ -21,6 +21,7 @@ export default class LabelPage {
       name: "Delete",
     });
 
+    this.undoButton = page.getByRole("button", { name: "Undo", exact: true });
     this.deleteMessage = page.getByText("Element deleted");
 
     this.selectAllCheckbox = page.getByRole("checkbox", {
@@ -40,6 +41,7 @@ export default class LabelPage {
 
   async openCreateForm() {
     await this.createButton.click();
+    await this.name.click();
   }
 
   async createLabel(name) {
@@ -58,6 +60,6 @@ export default class LabelPage {
   }
 
   getLabelCheckbox(name) {
-    return this.getLabelRow(name).locator('input[type="checkbox"]');
+    return this.getLabelRow(name).getByRole("checkbox");
   }
 }

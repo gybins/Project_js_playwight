@@ -1,5 +1,3 @@
-import { expect } from "@playwright/test";
-
 export default class LoginPage {
   constructor(page) {
     this.page = page;
@@ -22,9 +20,7 @@ export default class LoginPage {
       name: "Profile",
     });
 
-    this.logoutButton = page.getByTestId(
-      "PowerSettingsNewIcon"
-    );
+    this.logoutButton = page.getByRole("menuitem", { name: "Logout" });
   }
 
   async goto() {
@@ -32,13 +28,10 @@ export default class LoginPage {
   }
 
   async login(username, password) {
-    await this.username.waitFor({ state: "visible" });
-
+    await this.username.click();
     await this.username.fill(username);
-    await expect(this.username).toHaveValue(username);
 
     await this.password.fill(password);
-    await expect(this.password).toHaveValue(password);
 
     await this.button.click();
   }

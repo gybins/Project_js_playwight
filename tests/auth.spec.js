@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { credentials } from "./helpers/data.js";
 import LoginPage from "../pages/LoginPage.js";
 
 test("Successful login", async ({ page }) => {
@@ -6,8 +7,7 @@ test("Successful login", async ({ page }) => {
 
   await loginPage.goto();
 
-  const username = "user";
-  const password = "password";
+  const { username, password } = credentials;
 
   await loginPage.login(username, password);
 
@@ -19,8 +19,7 @@ test("Successful logout", async ({ page }) => {
 
   await loginPage.goto();
 
-  const username = "user";
-  const password = "password";
+  const { username, password } = credentials;
 
   await loginPage.login(username, password);
 
@@ -29,4 +28,13 @@ test("Successful logout", async ({ page }) => {
   await loginPage.logout();
 
   await expect(loginPage.button).toBeVisible();
+});
+test("empty login form is rejected", async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.button.click();
+  await expect(page).toHaveURL(/#\/login$/);
+  await expect(loginPage.username).toHaveAttribute("aria-invalid", "true");
+  await expect(loginPage.password).toHaveAttribute("aria-invalid", "true");
+  await expect(loginPage.profileButton).toHaveCount(0);
 });

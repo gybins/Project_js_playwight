@@ -2,9 +2,9 @@ export default class StatusPage {
   constructor(page) {
     this.page = page;
 
-    this.createButton = page.locator('a[href="#/task_statuses/create"]');
-    this.name = page.locator('input[name="name"]');
-    this.slug = page.locator('input[name="slug"]');
+    this.createButton = page.getByRole("link", { name: "Create", exact: true });
+    this.name = page.getByRole("textbox", { name: "Name", exact: true });
+    this.slug = page.getByRole("textbox", { name: "Slug", exact: true });
     this.saveButton = page.getByRole("button", { name: "Save" });
     this.successStatusCreate = page.getByText("Element created");
     this.nameHeader = page.getByRole("columnheader", {
@@ -36,6 +36,7 @@ export default class StatusPage {
 
   async openCreateForm() {
     await this.createButton.click();
+    await this.name.click();
   }
 
   async createStatus(name, slug) {
@@ -55,6 +56,6 @@ export default class StatusPage {
   }
 
   getStatusCheckbox(name) {
-    return this.getStatusRow(name).locator('input[type="checkbox"]');
+    return this.getStatusRow(name).getByRole("checkbox");
   }
 }
