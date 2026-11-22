@@ -1,6 +1,5 @@
 # QA Auto Engineer JavaScript Project
 
-[![Hexlet Check](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/hexlet-check.yml)
 [![Playwright Tests](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/playwright.yml/badge.svg)](https://github.com/gybins/qa-auto-engineer-javascript-project-90/actions/workflows/playwright.yml)
 
 ## Описание проекта
